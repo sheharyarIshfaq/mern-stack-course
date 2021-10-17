@@ -1,6 +1,7 @@
 const express = require("express");
 const HttpError = require("./models/http-error");
 const placesRouter = require("./routers/placesRouter");
+const usersRouter = require("./routers/usersRouter");
 
 const app = express();
 
@@ -9,6 +10,7 @@ const port = process.env.PORT || 5000;
 app.use(express.json());
 
 app.use("/api/places", placesRouter);
+app.use("/api/users", usersRouter);
 
 //adding error middleware for unsupported routes
 app.use((req, res, next) => {
