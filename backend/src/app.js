@@ -1,4 +1,5 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const HttpError = require("./models/http-error");
 const placesRouter = require("./routers/placesRouter");
 const usersRouter = require("./routers/usersRouter");
@@ -27,6 +28,15 @@ app.use((error, req, res, next) => {
   res.send({ message: error.message || "An unknown error occurred!" });
 });
 
-app.listen(port, () => {
-  console.log(`Server is listening on ${port}`);
-});
+mongoose
+  .connect(
+    "mongodb+srv://sheharyar:sheharyar@cluster0.pwoor.mongodb.net/places?retryWrites=true&w=majority"
+  )
+  .then(
+    app.listen(port, () => {
+      console.log(`Server is listening on ${port}`);
+    })
+  )
+  .catch((error) => {
+    console.log(error);
+  });
