@@ -1,8 +1,9 @@
-const { v4: uuidv4 } = require("uuid");
+const mongoose = require("mongoose");
 const { validationResult } = require("express-validator");
 const HttpError = require("../models/http-error");
 const getCoordsForAddress = require("../utils/location");
 const Place = require("../models/place");
+const User = require("../models/user");
 
 let DUMMY_PLACES = [
   {
@@ -87,8 +88,26 @@ const createPlace = async (req, res, next) => {
     creator,
   });
 
+  let user;
   try {
-    await createdPlace.save();
+    user = await User.findById(creator);
+  } catch (error) {
+    const err = new HttpError("Creating place failed, please try again", 500);
+    return next(err);
+  }
+
+  if (!user) {
+    const err = new HttpError("Could not find user for provided id", 404);
+    return next(err);
+  }
+
+  try {
+    const sess = await mongoose.startSession();
+    sess.startTransaction();
+    await createdPlace.save({ session: sess });
+    user.places.push(createdPlace);
+    await user.save({ session: sess });
+    await sess.commitTransaction();
   } catch (error) {
     const err = new HttpError("Creating place failed, please try again", 500);
     return next(err);
@@ -140,7 +159,7 @@ const deletePlace = async (req, res, next) => {
   const placeId = req.params.placeId;
   let place;
   try {
-    place = await Place.findById(placeId);
+    place = await Place.findById(placeId).populate("creator");
   } catch (error) {
     const err = new HttpError(
       "Something went wrong, couldn't delete the place",
@@ -149,8 +168,18 @@ const deletePlace = async (req, res, next) => {
     return next(err);
   }
 
+  if (!place) {
+    const err = new HttpError("Could not find the place", 404);
+    return next(err);
+  }
+
   try {
-    place.remove();
+    const sess = await mongoose.startSession();
+    sess.startTransaction();
+    await place.remove({ session: sess });
+    place.creator.places.pull(place);
+    await place.creator.save({ session: sess });
+    await sess.commitTransaction();
   } catch (error) {
     const err = new HttpError(
       "Something went wrong, couldn't delete the place",

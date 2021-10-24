@@ -36,7 +36,7 @@ const signup = async (req, res, next) => {
     );
     return next(err);
   }
-  const { name, email, password, places } = req.body;
+  const { name, email, password } = req.body;
 
   let existingUser;
   try {
@@ -57,7 +57,7 @@ const signup = async (req, res, next) => {
     image:
       "https://upload.wikimedia.org/wikipedia/commons/1/10/Empire_State_Building_%28aerial_view%29.jpg",
     password,
-    places,
+    places: [],
   });
 
   try {
