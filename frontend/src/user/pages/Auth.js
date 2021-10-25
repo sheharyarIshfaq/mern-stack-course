@@ -77,6 +77,9 @@ const Auth = () => {
           }),
         });
         const responseData = await response.json();
+        if (!response.ok) {
+          throw new Error(responseData.message);
+        }
         console.log(responseData);
         setIsLoading(false);
         authCtx.login();
@@ -87,49 +90,56 @@ const Auth = () => {
     }
   };
 
+  const errorHandler = () => {
+    setError(null);
+  };
+
   return (
-    <Card className="authentication">
-      {isLoading && <LoadingSpinner asOverlay />}
-      <h2>Login Required</h2>
-      <hr />
-      {!isLoginMode && (
-        <Input
-          id="name"
-          type="text"
-          label="Your Name"
-          element="input"
-          validators={[VALIDATOR_REQUIRE()]}
-          errorText="Please Enter your name"
-          onInput={inputHandler}
-        />
-      )}
-      <form onSubmit={authSubmitHandler}>
-        <Input
-          id="email"
-          element="input"
-          type="email"
-          label="E-Mail"
-          validators={[VALIDATOR_EMAIL()]}
-          errorText="Please provide a valid email address!"
-          onInput={inputHandler}
-        />
-        <Input
-          id="password"
-          element="input"
-          type="password"
-          label="Password"
-          validators={[VALIDATOR_MINLENGTH(5)]}
-          errorText="Please provide a valid password! (Atleast 5 characters long"
-          onInput={inputHandler}
-        />
-        <Button type="submit" disabled={!formState.isValid}>
-          {isLoginMode ? "Login" : "Signup"}
+    <>
+      <ErrorModal error={error} onClear={errorHandler} />
+      <Card className="authentication">
+        {isLoading && <LoadingSpinner asOverlay />}
+        <h2>Login Required</h2>
+        <hr />
+        {!isLoginMode && (
+          <Input
+            id="name"
+            type="text"
+            label="Your Name"
+            element="input"
+            validators={[VALIDATOR_REQUIRE()]}
+            errorText="Please Enter your name"
+            onInput={inputHandler}
+          />
+        )}
+        <form onSubmit={authSubmitHandler}>
+          <Input
+            id="email"
+            element="input"
+            type="email"
+            label="E-Mail"
+            validators={[VALIDATOR_EMAIL()]}
+            errorText="Please provide a valid email address!"
+            onInput={inputHandler}
+          />
+          <Input
+            id="password"
+            element="input"
+            type="password"
+            label="Password"
+            validators={[VALIDATOR_MINLENGTH(5)]}
+            errorText="Please provide a valid password! (Atleast 5 characters long"
+            onInput={inputHandler}
+          />
+          <Button type="submit" disabled={!formState.isValid}>
+            {isLoginMode ? "Login" : "Signup"}
+          </Button>
+        </form>
+        <Button inverse onClick={switchModehandler}>
+          Switch to {isLoginMode ? "Signup" : "Login"}
         </Button>
-      </form>
-      <Button inverse onClick={switchModehandler}>
-        Switch to {isLoginMode ? "Signup" : "Login"}
-      </Button>
-    </Card>
+      </Card>
+    </>
   );
 };
 
