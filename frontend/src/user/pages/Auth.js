@@ -2,6 +2,8 @@ import React, { useContext, useState } from "react";
 import Button from "../../shared/components/UI/Button";
 import Card from "../../shared/components/UI/Card";
 import Input from "../../shared/components/UI/Input";
+import ErrorModal from "../../shared/components/UI/ErrorModal";
+import LoadingSpinner from "../../shared/components/UI/LoadingSpinner";
 import {
   VALIDATOR_EMAIL,
   VALIDATOR_MINLENGTH,
@@ -16,6 +18,8 @@ const Auth = () => {
   const authCtx = useContext(AuthContext);
 
   const [isLoginMode, setIsLoginMode] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   const [formState, inputHandler, setFormData] = useForm(
     {
@@ -60,6 +64,7 @@ const Auth = () => {
     if (isLoginMode) {
     } else {
       try {
+        setIsLoading(true);
         const response = await fetch("http://localhost:5000/api/users/signup", {
           method: "POST",
           headers: {
@@ -73,15 +78,18 @@ const Auth = () => {
         });
         const responseData = await response.json();
         console.log(responseData);
+        setIsLoading(false);
+        authCtx.login();
       } catch (error) {
-        console.log(error);
+        setIsLoading(false);
+        setError(error.message || "Something went wrong, please try again");
       }
     }
-    authCtx.login();
   };
 
   return (
     <Card className="authentication">
+      {isLoading && <LoadingSpinner asOverlay />}
       <h2>Login Required</h2>
       <hr />
       {!isLoginMode && (
