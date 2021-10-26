@@ -76,7 +76,10 @@ const login = async (req, res, next) => {
     return next(err);
   }
 
-  res.send({ message: "Logged In!" });
+  res.send({
+    message: "Logged In!",
+    user: existingUser.toObject({ getters: true }),
+  });
 };
 
 module.exports = { getUsers, signup, login };
