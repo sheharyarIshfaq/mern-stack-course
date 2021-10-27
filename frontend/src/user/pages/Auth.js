@@ -4,6 +4,7 @@ import Card from "../../shared/components/UI/Card";
 import Input from "../../shared/components/UI/Input";
 import ErrorModal from "../../shared/components/UI/ErrorModal";
 import LoadingSpinner from "../../shared/components/UI/LoadingSpinner";
+import ImageUpload from "../../shared/components/UI/ImageUpload";
 import {
   VALIDATOR_EMAIL,
   VALIDATOR_MINLENGTH,
@@ -41,6 +42,7 @@ const Auth = () => {
         {
           ...formState.inputs,
           name: undefined,
+          image: undefined,
         },
         formState.inputs.email.isValid && formState.inputs.password.isValid
       );
@@ -50,6 +52,10 @@ const Auth = () => {
           ...formState.inputs,
           name: {
             value: "",
+            isValid: false,
+          },
+          image: {
+            value: null,
             isValid: false,
           },
         },
@@ -104,18 +110,21 @@ const Auth = () => {
         {isLoading && <LoadingSpinner asOverlay />}
         <h2>Login Required</h2>
         <hr />
-        {!isLoginMode && (
-          <Input
-            id="name"
-            type="text"
-            label="Your Name"
-            element="input"
-            validators={[VALIDATOR_REQUIRE()]}
-            errorText="Please Enter your name"
-            onInput={inputHandler}
-          />
-        )}
         <form onSubmit={authSubmitHandler}>
+          {!isLoginMode && (
+            <Input
+              id="name"
+              type="text"
+              label="Your Name"
+              element="input"
+              validators={[VALIDATOR_REQUIRE()]}
+              errorText="Please Enter your name"
+              onInput={inputHandler}
+            />
+          )}
+          {!isLoginMode && (
+            <ImageUpload id="image" center onInput={inputHandler} />
+          )}
           <Input
             id="email"
             element="input"
