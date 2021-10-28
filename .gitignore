@@ -2,6 +2,8 @@
 **/.eslintcache
 **/.next
 
+**/uploads
+
 
 .DS_Store
 .vscode
