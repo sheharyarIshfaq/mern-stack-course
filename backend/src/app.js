@@ -31,13 +31,11 @@ app.use((req, res, next) => {
 app.use("/api/places", placesRouter);
 app.use("/api/users", usersRouter);
 
-//adding error middleware for unsupported routes
 app.use((req, res, next) => {
   const error = new HttpError("Could not find this route!", 404);
   next(error);
 });
 
-//adding middleware for error handling
 app.use((error, req, res, next) => {
   if (req.file) {
     fs.unlink(req.file.path, (error) => {
