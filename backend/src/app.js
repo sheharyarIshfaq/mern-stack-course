@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("path");
 const mongoose = require("mongoose");
 const HttpError = require("./models/http-error");
 const placesRouter = require("./routers/placesRouter");
@@ -9,6 +10,11 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 app.use(express.json());
+
+app.use(
+  "/src/uploads/images",
+  express.static(path.join("src", "uploads", "images"))
+);
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
