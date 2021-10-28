@@ -18,7 +18,10 @@ const getPlaceById = async (req, res, next) => {
     return next(err);
   }
   if (!place) {
-    const error = new HttpError("Could not find a place for the provided id");
+    const error = new HttpError(
+      "Could not find a place for the provided id",
+      404
+    );
     return next(error);
   }
   res.send({ place: place.toObject({ getters: true }) });
@@ -26,9 +29,9 @@ const getPlaceById = async (req, res, next) => {
 
 const getPlacesByUserId = async (req, res, next) => {
   const userId = req.params.userId;
-  let places;
+  let userWithPlaces;
   try {
-    places = await Place.find({ creator: userId });
+    userWithPlaces = await User.findById(userId).populate("places");
   } catch (error) {
     const err = new HttpError(
       "Something went wrong, unable to find the places",
@@ -36,14 +39,17 @@ const getPlacesByUserId = async (req, res, next) => {
     );
     return next(err);
   }
-  if (!places || places.length === 0) {
+  if (!userWithPlaces || userWithPlaces.places.length === 0) {
     const error = new HttpError(
-      "Could not find a place for the provided user id"
+      "Could not find a place for the provided user id",
+      404
     );
     return next(error);
   }
   res.send({
-    places: places.map((place) => place.toObject({ getters: true })),
+    places: userWithPlaces.places.map((place) =>
+      place.toObject({ getters: true })
+    ),
   });
 };
 
@@ -67,8 +73,8 @@ const createPlace = async (req, res, next) => {
   const createdPlace = new Place({
     title,
     description,
-    location: coordinates,
     address,
+    location: coordinates,
     image:
       "https://upload.wikimedia.org/wikipedia/commons/1/10/Empire_State_Building_%28aerial_view%29.jpg",
     creator,
@@ -99,7 +105,7 @@ const createPlace = async (req, res, next) => {
     return next(err);
   }
 
-  res.status(201).send(createdPlace);
+  res.status(201).send({ place: createdPlace });
 };
 
 const updatePlace = async (req, res, next) => {
