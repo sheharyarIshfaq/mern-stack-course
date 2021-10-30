@@ -72,7 +72,7 @@ const signup = async (req, res, next) => {
   try {
     token = jwt.sign(
       { userId: createdUser.id, email: createdUser.email },
-      "my-mern-application",
+      process.env.JWT_KEY,
       { expiresIn: "1h" }
     );
   } catch (error) {
@@ -116,7 +116,7 @@ const login = async (req, res, next) => {
   try {
     token = jwt.sign(
       { userId: existingUser.id, email: existingUser.email },
-      "my-mern-application",
+      process.env.JWT_KEY,
       { expiresIn: "1h" }
     );
   } catch (error) {

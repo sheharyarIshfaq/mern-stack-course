@@ -3,6 +3,9 @@
 **/.next
 
 **/uploads
+**/nodemon.json
+**/.env
+**/.env.production
 
 
 .DS_Store
