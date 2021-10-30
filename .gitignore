@@ -6,6 +6,7 @@
 **/nodemon.json
 **/.env
 **/.env.production
+**/build/
 
 
 .DS_Store
